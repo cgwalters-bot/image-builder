@@ -23,6 +23,7 @@ type BootcDiskImage struct {
 
 	Bootloader    *string
 	UnifiedKernel bool
+	Composefs     bool
 
 	Partitions []PartitionConfig
 
@@ -114,6 +115,7 @@ func (img *BootcDiskImage) InstantiateManifestFromContainers(m *manifest.Manifes
 	}
 	rawImage.Bootloader = img.Bootloader
 	rawImage.UnifiedKernel = img.UnifiedKernel
+	rawImage.Composefs = img.Composefs
 	rawImage.PartitionTable = img.PartitionTable
 	rawImage.OSCustomizations = img.OSCustomizations
 	rawImage.DiskCustomizations = img.DiskCustomizations

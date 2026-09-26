@@ -37,7 +37,9 @@ type RawBootcImage struct {
 	LiveBoot bool
 
 	UnifiedKernel bool
-	Bootloader    *string
+	// The container selects the composefs backend in its install configuration
+	Composefs  bool
+	Bootloader *string
 
 	// customizations go here because there is no intermediate
 	// tree, with `bootc install to-filesystem` we can only work
@@ -170,7 +172,8 @@ func (p *RawBootcImage) serialize() (osbuild.Pipeline, error) {
 		opts.Kargs = p.OSCustomizations.KernelOptionsAppend
 	}
 	// Unified implies that the composefs backend must be used
-	if p.UnifiedKernel {
+	composefs := p.UnifiedKernel || p.Composefs
+	if composefs {
 		opts.ComposeFS = common.ToPtr(true)
 	}
 	if p.Bootloader != nil {
@@ -196,7 +199,7 @@ func (p *RawBootcImage) serialize() (osbuild.Pipeline, error) {
 		pipeline.AddStage(stage)
 	}
 
-	if !p.UnifiedKernel {
+	if !composefs {
 		// all our customizations work directly on the mounted deployment
 		// root from the image so generate the devices/mounts for all
 		devices, mounts, err = osbuild.GenBootupdDevicesMounts(p.filename, p.PartitionTable, p.platform)
